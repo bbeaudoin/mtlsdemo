@@ -1,8 +1,6 @@
 #!/usr/bin/bash
 oc new-project test 2>/dev/null
-sed -i 's/0.0.0.0:443/0.0.0.0:8443/' py-gunicorn/gunicorn.conf
 cp py-gunicorn/Dockerfile.server py-gunicorn/Dockerfile
-echo "EXPOSE 8443" >> py-gunicorn/Dockerfile
 oc new-build --strategy docker --binary --docker-image=python:alpine --name hello-mytls-server
 oc start-build hello-mytls-server --from-dir py-gunicorn/ --follow
 oc create secret generic hello-mytls-server --from-file appcerts/root.crt --from-file appcerts/server/site.crt --from-file appcerts/server/site.key
