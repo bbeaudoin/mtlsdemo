@@ -1,7 +1,7 @@
 #!/usr/bin/bash
 
 # Configuration
-CERT_PATH=./certs
+CERT_PATH=$(pwd)/certs
 PUBLIC_HOSTNAME=$1
 
 # Make a directory for certificates, if missing
@@ -29,7 +29,7 @@ openssl req -new -newkey rsa:2048 -days 365 -nodes \
 openssl x509 -req -days 365 -CAcreateserial \
   -CA ${CERT_PATH}/root.crt \
   -CAkey ${CERT_PATH}/root.key \
-  -extfile v3.ext \
+  -extfile source/scripts/v3.ext \
   -in ${CERT_PATH}/server/site.csr \
   -out ${CERT_PATH}/server/site.crt
 

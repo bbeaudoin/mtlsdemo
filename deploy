@@ -1,23 +1,31 @@
 #!/usr/bin/bash
 
 # Generate and copy the root certificate
-./makecerts hello-mytls-server.test.svc.cluster.local
-cp appcerts/root.crt py-gunicorn/
+./source/scripts/makecerts hello-mytls-server.test.svc.cluster.local
+cp certs/root.crt source/server/
 
-# Build and deploy the server
+# Create a new project named 'test'
 oc new-project test 2>/dev/null
-cp py-gunicorn/Dockerfile.server py-gunicorn/Dockerfile
+
+# Add the certificates to the project as secrets
+oc create secret generic hello-mytls-server --from-file certs/root.crt --from-file certs/server/site.crt --from-file certs/server/site.key
+oc create secret generic hello-mytls-client --from-file certs/root.crt --from-file certs/client/site.crt --from-file certs/client/site.key
+
+# Build and deploy the server (binary build rather than git source)
 oc new-build --strategy docker --binary --docker-image=python:alpine --name hello-mytls-server
-oc start-build hello-mytls-server --from-dir py-gunicorn/ --follow
-oc create secret generic hello-mytls-server --from-file appcerts/root.crt --from-file appcerts/server/site.crt --from-file appcerts/server/site.key
+oc start-build hello-mytls-server --from-dir source/server/ --follow
 oc new-app hello-mytls-server
+
+# Mount the server certificates to the deployment
 oc set volume dc/hello-mytls-server --add --type secret --mount-path /var/run/autocert.step.sm/ --secret-name hello-mytls-server --name certificates
 
-# Build and deploy the client
-cp py-gunicorn/Dockerfile.client py-gunicorn/Dockerfile
+# Build and deploy the client (binary build rather than git source)
 oc new-build --strategy docker --binary --docker-image=python:alpine --name hello-mytls-client
-oc start-build hello-mytls-client --from-dir py-gunicorn/ --follow
-oc create secret generic hello-mytls-client --from-file appcerts/root.crt --from-file appcerts/client/site.crt --from-file appcerts/client/site.key
+oc start-build hello-mytls-client --from-dir source/client/ --follow
 oc new-app hello-mytls-client
+
+# Map the client certificates to the deployment
 oc set volume dc/hello-mytls-client --add --type secret --mount-path /var/run/autocert.step.sm/ --secret-name hello-mytls-client --name certificates
+
+# Configure the client for the server to connect (https://hostname[:port])
 oc set env dc/hello-mytls-client --overwrite HELLO_MTLS_URL=https://hello-mytls-server.test.svc.cluster.local:8443
