@@ -1,7 +1,7 @@
 #!/usr/bin/bash
 
 # Generate and copy the root certificate
-./mkcerts
+./makecerts hello-mytls-server.test.svc.cluster.local
 cp appcerts/root.crt py-gunicorn/
 
 # Build and deploy the server

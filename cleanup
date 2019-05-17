@@ -1,3 +1,3 @@
-rm -rf appcerts py-gunicorn/root.crt
+rm -rf certs py-gunicorn/root.crt
 oc delete all --all -n test
 oc delete secrets hello-mytls-client hello-mytls-server -n test

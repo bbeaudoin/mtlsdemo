@@ -1,8 +1,8 @@
 #!/usr/bin/bash
 
 # Configuration
-CERT_PATH=./appcerts
-PUBLIC_HOSTNAME=hello-mytls-server.test.svc.cluster.local
+CERT_PATH=./certs
+PUBLIC_HOSTNAME=$1
 
 # Make a directory for certificates, if missing
 if [ ! -e "${CERT_PATH}" ]; then
