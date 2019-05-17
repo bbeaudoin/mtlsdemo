@@ -15,12 +15,12 @@ if [ ! -e ${CERT_PATH}/custom-ca.key ]; then
   openssl req -new -newkey rsa:2048 -days 3652 -nodes -x509 \
     -keyout ${CERT_PATH}/custom-ca.key \
     -out ${CERT_PATH}/custom-ca.crt \
-    -subj '/C=US/ST=GA/L=Atlanta/O=VMware/OU=Lab/CN=OpenShiftHappens CA'
+    -subj '/C=US/ST=GA/L=Atlanta/O=VMware/OU=Lab/CN=Example CA'
   # Create the intermediate certificate request
   openssl req -new -newkey rsa:2048 -days 1826 -nodes \
     -keyout ${CERT_PATH}/custom-intermediate.key \
     -out ${CERT_PATH}/custom-intermediate.csr \
-    -subj '/C=US/ST=GA/L=Atlanta/O=VMware/OU=Lab/CN=OpenShiftHappens Intermediate CA'
+    -subj '/C=US/ST=GA/L=Atlanta/O=VMware/OU=Lab/CN=Example Intermediate CA'
   # Create the intermediate certificate
   openssl x509 -req -days 1826 -CAcreateserial \
     -extensions v3_intermediate_ca \
@@ -51,7 +51,7 @@ openssl x509 -req -days 365 -CAcreateserial \
 openssl req -new -newkey rsa:2048 -days 365 -nodes \
   -keyout ${CERT_PATH}/client/site.key \
   -out ${CERT_PATH}/client/site.csr \
-  -subj '/C=US/ST=GA/L=Atlanta/O=VMware/OU=Lab/CN=myapp@openshifthappens.com'
+  -subj '/C=US/ST=GA/L=Atlanta/O=VMware/OU=Lab/CN=myapp@example.com'
 
 # Sign the certificate with the CA and put it in ${CERT_PATH}/
 openssl x509 -req -days 365 -CAcreateserial \
