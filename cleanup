@@ -1,0 +1,2 @@
+oc delete all --all
+oc delete secrets hello-mytls-client hello-mytls-server
