@@ -1,4 +1,10 @@
 #!/usr/bin/bash
+
+# Generate and copy the root certificate
+./mkcerts
+cp appcerts/root.crt py-gunicorn/
+
+# Build and deploy the server
 oc new-project test 2>/dev/null
 cp py-gunicorn/Dockerfile.server py-gunicorn/Dockerfile
 oc new-build --strategy docker --binary --docker-image=python:alpine --name hello-mytls-server

@@ -10,26 +10,12 @@ if [ ! -e "${CERT_PATH}" ]; then
 fi
 
 # Create the CA and intermediate pair
-if [ ! -e ${CERT_PATH}/custom-ca.key ]; then
+if [ ! -e ${CERT_PATH}/root.key ]; then
   # Create the CA certificate
   openssl req -new -newkey rsa:2048 -days 3652 -nodes -x509 \
-    -keyout ${CERT_PATH}/custom-ca.key \
-    -out ${CERT_PATH}/custom-ca.crt \
+    -keyout ${CERT_PATH}/root.key \
+    -out ${CERT_PATH}/root.crt \
     -subj '/C=US/ST=GA/L=Atlanta/O=VMware/OU=Lab/CN=Example CA'
-  # Create the intermediate certificate request
-  openssl req -new -newkey rsa:2048 -days 1826 -nodes \
-    -keyout ${CERT_PATH}/custom-intermediate.key \
-    -out ${CERT_PATH}/custom-intermediate.csr \
-    -subj '/C=US/ST=GA/L=Atlanta/O=VMware/OU=Lab/CN=Example Intermediate CA'
-  # Create the intermediate certificate
-  openssl x509 -req -days 1826 -CAcreateserial \
-    -extensions v3_intermediate_ca \
-    -CA ${CERT_PATH}/custom-ca.crt \
-    -CAkey ${CERT_PATH}/custom-ca.key \
-    -in ${CERT_PATH}/custom-intermediate.csr \
-    -out ${CERT_PATH}/custom-intermediate.crt
-  # Concatenate the certificates into a single file
-  cat ${CERT_PATH}/custom-ca.crt ${CERT_PATH}/custom-intermediate.crt >${CERT_PATH}/root.crt
 fi
 
 # Generate certificate request and put it in ${CERT_PATH}/
@@ -41,8 +27,8 @@ openssl req -new -newkey rsa:2048 -days 365 -nodes \
 
 # Sign the certificate with the CA and put it in ${CERT_PATH}/
 openssl x509 -req -days 365 -CAcreateserial \
-  -CA ${CERT_PATH}/custom-ca.crt \
-  -CAkey ${CERT_PATH}/custom-ca.key \
+  -CA ${CERT_PATH}/root.crt \
+  -CAkey ${CERT_PATH}/root.key \
   -extfile v3.ext \
   -in ${CERT_PATH}/server/site.csr \
   -out ${CERT_PATH}/server/site.crt
@@ -55,7 +41,7 @@ openssl req -new -newkey rsa:2048 -days 365 -nodes \
 
 # Sign the certificate with the CA and put it in ${CERT_PATH}/
 openssl x509 -req -days 365 -CAcreateserial \
-  -CA ${CERT_PATH}/custom-ca.crt \
-  -CAkey ${CERT_PATH}/custom-ca.key \
+  -CA ${CERT_PATH}/root.crt \
+  -CAkey ${CERT_PATH}/root.key \
   -in ${CERT_PATH}/client/site.csr \
   -out ${CERT_PATH}/client/site.crt
